@@ -41,18 +41,27 @@ def solver_from_file(filename)
   ShapesSolver.new(shapes, target)
 end
 
-solver = solver_from_file(argv.last)
-solver.debug = debug
+def solve(debug, filename)
+  solver = solver_from_file filename
+  solver.debug = debug
 
-puts "Shapes:"
-puts solver.shapes.join("\n\n")
+  puts "Shapes:"
+  puts solver.shapes.join("\n\n")
+  puts ""
 
-puts ""
-puts "Target:"
-puts solver.target.to_s
+  puts "Target:"
+  puts solver.target.to_s
+  puts ""
 
-solution = solver.solve
+  solution = solver.solve
 
-puts ""
-puts "Solution:"
-puts solver.render_solution(solution).to_s
+  puts "Solution:"
+  puts solver.render_solution(solution).to_s
+  puts ""
+end
+
+argv.each do |filename|
+  puts "Filename: #{filename}"
+  puts ""
+  solve debug, filename
+end

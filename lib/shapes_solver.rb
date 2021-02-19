@@ -35,8 +35,10 @@ class ShapesSolver < DFSSolver
       end
     end
 
+    precomputed_placement_count = precompute_placements_count_at_target(@possible_placements)
+
     @possible_placements = @possible_placements
-      .sort_by { |placement| placement_score @possible_placements, placement }
+      .sort_by { |placement| placement_score @possible_placements, precomputed_placement_count, placement }
   end
 
   def initial_remaining_space
@@ -47,13 +49,21 @@ class ShapesSolver < DFSSolver
   # determined by how many other possible placements can pixels
   # on that placement by satisfied. Lower possible other placements
   # mean higher importance
-  def placement_score(placements, placement)
+  def placement_score(placements, precomputed_counts, placement)
     placement[:shape].each_filled_pixel.map do |row, col|
       target_row = row + placement[:row]
       target_col = col + placement[:col]
 
-      placements_at_target(placements, target_row, target_col).count
+      precomputed_counts[[target_row, target_col]]
     end.min
+  end
+
+  def precompute_placements_count_at_target(placements)
+    counts_at_pixel = {}
+    target.each_filled_pixel.each do |row, col, _|
+      counts_at_pixel[[row, col]] = placements_at_target(placements, row, col).count
+    end
+    counts_at_pixel
   end
 
   def placements_at_target(placements, target_row, target_col)

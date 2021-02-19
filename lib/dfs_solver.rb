@@ -12,9 +12,9 @@ class DFSSolver
     while !completed?(solution)
       iterations += 1
       if debug && iterations % 10000 == 0
-        puts ""
         puts "Iteration: #{iterations} (#{(10000 / (Time.now - last_iterations_time)).to_i} / s)"
         puts render_solution(solution).to_s
+        puts ""
         last_iterations_time = Time.now
       end
 
@@ -32,9 +32,9 @@ class DFSSolver
     end
 
     if debug
-      puts ""
       puts "Solved in iteration: #{iterations} (#{(iterations / (Time.now - started)).to_i} / s)"
       puts render_solution(solution).to_s
+      puts ""
     end
 
     return solution

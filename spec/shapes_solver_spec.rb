@@ -50,7 +50,7 @@ RSpec.describe ShapesSolver do
     it "is first placement when solution empty" do
       solution, remaining_space = solver.next_placement([], solver.initial_remaining_space)
       expect(solution.last).to eq solver.possible_placements.first
-      expect(remaining_space.map { |s| solver.possible_placements.find_index s }).to eq [12, 13, 17, 21, 23]
+      expect(remaining_space.map { |s| solver.possible_placements.find_index s }).to eq [12, 13, 15, 19, 23]
 
       solution, remaining_space = solver.next_placement(solution, remaining_space)
       expect(solution.last).to eq solver.possible_placements[12]
@@ -183,12 +183,6 @@ b
 1, 0, 0:
 bbb
 
-1, 1, 0:
-bbb
-
-1, 2, 0:
-bbb
-
 1, 3, 0:
 bbb
 
@@ -200,19 +194,25 @@ cc
 cc
 cc
 
-2, 1, 0:
-cc
-cc
-
-2, 1, 1:
-cc
-cc
-
 2, 2, 0:
 cc
 cc
 
 2, 2, 1:
+cc
+cc
+
+1, 1, 0:
+bbb
+
+1, 2, 0:
+bbb
+
+2, 1, 0:
+cc
+cc
+
+2, 1, 1:
 cc
 cc
 
