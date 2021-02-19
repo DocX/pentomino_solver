@@ -1,7 +1,7 @@
 require './lib/shapes_solver'
 
 RSpec.describe ShapesSolver do
-  let(:shapes) do  
+  let(:shapes) do
     [
       Shape.from_string(%{
         aaa
@@ -48,20 +48,13 @@ RSpec.describe ShapesSolver do
 
   describe "#next_placement" do
     it "is first placement when solution empty" do
-      expect(solver.next_placement([], nil)).to eq solver.possible_placements.first
-    end
+      solution, remaining_space = solver.next_placement([], solver.initial_remaining_space)
+      expect(solution.last).to eq solver.possible_placements.first
+      expect(remaining_space.map { |s| solver.possible_placements.find_index s }).to eq [12, 13, 17, 21, 23]
 
-    it "is next first valid shape" do
-      solution = [solver.possible_placements.first]
-
-      expect(solver.next_placement(solution, nil)).to eq solver.possible_placements[12]
-    end
-
-    it "is second placement when last was first" do
-      solution = []
-      last = solver.possible_placements.first
-
-      expect(solver.next_placement(solution, last)).to eq solver.possible_placements[1]
+      solution, remaining_space = solver.next_placement(solution, remaining_space)
+      expect(solution.last).to eq solver.possible_placements[12]
+      expect(remaining_space.map { |s| solver.possible_placements.find_index s }).to eq []
     end
   end
 
@@ -109,7 +102,7 @@ RSpec.describe ShapesSolver do
   end
 
   describe "#possible_placements" do
-    it "contains exactly all possible placements" do 
+    it "contains exactly all possible placements" do
       possible_placements_readable = StringIO.new
       solver.possible_placements.each do |placement|
         possible_placements_readable.puts "#{placement[:shape_id]}, #{placement[:row]}, #{placement[:col]}:"

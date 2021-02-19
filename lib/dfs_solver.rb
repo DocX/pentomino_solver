@@ -1,6 +1,7 @@
 class DFSSolver
   def solve
     solution = []
+    remaining_space = [initial_remaining_space]
 
     iterations = 0
 
@@ -12,36 +13,37 @@ class DFSSolver
         puts render_solution(solution).to_s
       end
 
-      placement = next_placement(solution, nil)
+      next_solution, next_remaining_space = next_placement(solution, remaining_space.last)
 
-      if placement.nil?
-        solution = backtrack(solution)
+      if next_solution.nil?
+        # backtrack - go step above and remove last placement from the space
+        last_placement = solution.pop
+        remaining_space.pop
+        remaining_space[remaining_space.count - 1] = remaining_space.last.reject { |placement| placement.equal? last_placement }
       else
-        solution << placement
+        solution = next_solution
+        remaining_space << next_remaining_space
       end
+    end
+
+    if defined?(DEBUG)
+      puts
+      puts "Solved in iteration: #{iterations}"
+      puts render_solution(solution).to_s
     end
 
     return solution
   end
 
-  def backtrack(solution)
-    alternative = nil
-    while alternative.nil?
-      raise "No solution" if solution.empty?
-
-      last_placement = solution.pop
-      alternative = next_placement(solution, last_placement)
-    end
-
-    solution << alternative
-    solution
+  def initial_remaining_space
+    raise NotImplementedError
   end
 
   def completed?(solution)
     raise NotImplementedError
   end
 
-  def next_placement(solution, previous)
+  def next_placement(solution, remaining_space)
     raise NotImplementedError
   end
 

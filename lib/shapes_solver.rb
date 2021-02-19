@@ -24,12 +24,12 @@ class ShapesSolver < DFSSolver
       shape.uniq_orientations.each do |shape_orientation|
         all_placements = target.all_placements(shape_orientation)
 
-        all_placements.each do |row, col| 
-          @possible_placements << { 
-            shape_id: shape_id, 
-            shape: shape_orientation, 
-            row: row, 
-            col: col 
+        all_placements.each do |row, col|
+          @possible_placements << {
+            shape_id: shape_id,
+            shape: shape_orientation,
+            row: row,
+            col: col
           }
         end
       end
@@ -38,20 +38,29 @@ class ShapesSolver < DFSSolver
     @possible_placements
   end
 
-  def next_placement(solution, last)
-    valid_next_placements(solution)
-      .drop_while { |placement| !last.nil? && !placement.equal?(last) }
-      .select { |placement| !placement.equal?(last) }
-      .first
+  def initial_remaining_space
+    possible_placements
   end
 
-  def valid_next_placements(solution)
-    current_shape_id = solution.count
+  def next_placement(solution, remaining_space)
+    # Check if remaining space contains all remaining shapes
+    return [nil, nil] unless (solution.count ... shapes.count).all? { |shape_id|
+      remaining_space.any? { |placement| placement[:shape_id] == shape_id }
+    }
 
-    possible_placements.lazy.select do |placement|
-      placement[:shape_id] == current_shape_id &&
-      valid_placement?(solution, placement)
-    end
+    # Lock each solution step to given shape id to avoid searching thru same space twice
+    # as two identical sub-solutions could be computed when swapped shapes order
+    # It is impossible to have two identical sub-solutions when shape is locked to each step
+    current_shape_id = solution.count
+    placement = remaining_space.find { |placement| placement[:shape_id] == current_shape_id }
+    return [nil, nil] if placement.nil?
+
+    next_solution = solution + [placement]
+    next_space = remaining_space
+      .select { |placement| placement[:shape_id] != current_shape_id }
+      .select { |placement| valid_placement?(next_solution, placement) }
+
+    [next_solution, next_space]
   end
 
   # Valid placement is one that does not cover already placed shapes
