@@ -1,4 +1,4 @@
-require './lib/shape'
+require './lib/shape.rb'
 
 module Pentomino
   F = Shape.from_string(%{
@@ -55,7 +55,7 @@ module Pentomino
   W = Shape.from_string(%{
     W
     WW
-     WW 
+     WW
   })
 
   X = Shape.from_string(%{

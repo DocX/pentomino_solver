@@ -1,16 +1,20 @@
 class DFSSolver
+  attr_accessor :debug
+
   def solve
     solution = []
     remaining_space = [initial_remaining_space]
 
     iterations = 0
+    last_iterations_time = Time.now
 
     while !completed?(solution)
       iterations += 1
-      if defined?(DEBUG) && iterations % 10000 == 0
-        puts
-        puts "Iteration: #{iterations}"
+      if debug && iterations % 10000 == 0
+        puts ""
+        puts "Iteration: #{iterations} (#{(10000 / (Time.now - last_iterations_time)).to_i} / s)"
         puts render_solution(solution).to_s
+        last_iterations_time = Time.now
       end
 
       next_solution, next_remaining_space = next_placement(solution, remaining_space.last)
@@ -26,8 +30,8 @@ class DFSSolver
       end
     end
 
-    if defined?(DEBUG)
-      puts
+    if debug
+      puts ""
       puts "Solved in iteration: #{iterations}"
       puts render_solution(solution).to_s
     end

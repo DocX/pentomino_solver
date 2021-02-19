@@ -1,5 +1,5 @@
-require './lib/dfs_solver'
-require './lib/shape'
+require './lib/dfs_solver.rb'
+require './lib/shape.rb'
 
 class ShapesSolver < DFSSolver
   # initialize with list of all possible placements
