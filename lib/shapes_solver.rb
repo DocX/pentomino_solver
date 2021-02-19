@@ -35,17 +35,44 @@ class ShapesSolver < DFSSolver
       end
     end
 
-    @possible_placements
+    @possible_placements = @possible_placements
+      .sort_by { |placement| placement_score @possible_placements, placement }
   end
 
   def initial_remaining_space
     possible_placements
   end
 
+  # Get score of placement based on how "important" it is
+  # determined by how many other possible placements can pixels
+  # on that placement by satisfied. Lower possible other placements
+  # mean higher importance
+  def placement_score(placements, placement)
+    placement[:shape].each_filled_pixel.map do |row, col|
+      target_row = row + placement[:row]
+      target_col = col + placement[:col]
+
+      placements_at_target(placements, target_row, target_col).count
+    end.min
+  end
+
+  def placements_at_target(placements, target_row, target_col)
+    placements.select do |placement|
+      placement[:shape].each_filled_pixel.any? do |row, col|
+        placement_target_row = row + placement[:row]
+        placement_target_col = col + placement[:col]
+
+        target_row == placement_target_row && target_col == placement_target_col
+      end
+    end
+  end
+
   def next_placement(solution, remaining_space)
     # Check if remaining space contains all remaining shapes
-    return [nil, nil] unless (solution.count ... shapes.count).all? { |shape_id|
-      remaining_space.any? { |placement| placement[:shape_id] == shape_id }
+    placed_shapes_ids = solution.map { |placement| placement[:shape_id] }
+    remaining_shapes_ids = (0 ... shapes.count).to_a - placed_shapes_ids
+    return [nil, nil] unless remaining_shapes_ids.all? { |remaining_shape_id|
+      remaining_space.any? { |placement| placement[:shape_id] == remaining_shape_id }
     }
 
     # Check if there are pixels that cannot be covered by any of the remaining placements
@@ -60,7 +87,7 @@ class ShapesSolver < DFSSolver
     # Lock each solution step to given shape id to avoid searching thru same space twice
     # as two identical sub-solutions could be computed when swapped shapes order
     # It is impossible to have two identical sub-solutions when shape is locked to each step
-    current_shape_id = solution.count
+    current_shape_id = remaining_space.first[:shape_id]
     placement = remaining_space.find { |placement| placement[:shape_id] == current_shape_id }
     return [nil, nil] if placement.nil?
 

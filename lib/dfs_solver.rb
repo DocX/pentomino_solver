@@ -7,6 +7,7 @@ class DFSSolver
 
     iterations = 0
     last_iterations_time = Time.now
+    started = Time.now
 
     while !completed?(solution)
       iterations += 1
@@ -32,7 +33,7 @@ class DFSSolver
 
     if debug
       puts ""
-      puts "Solved in iteration: #{iterations}"
+      puts "Solved in iteration: #{iterations} (#{(iterations / (Time.now - started)).to_i} / s)"
       puts render_solution(solution).to_s
     end
 

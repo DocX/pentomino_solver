@@ -77,5 +77,5 @@ module Pentomino
      ZZ
   })
 
-  ALL_12 = [F, I, L, N, P, T, U, V, W, X, Y, Z]
+  ALL_12 = [F, L, N, P, T, U, V, W, X, Y, Z, I]
 end
