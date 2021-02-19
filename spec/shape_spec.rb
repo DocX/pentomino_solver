@@ -1,6 +1,6 @@
 require './lib/shape'
 
-RSpec.describe Shape do 
+RSpec.describe Shape do
   describe ".from_string" do
     let(:unpadded) do
       Shape.from_string(
@@ -10,9 +10,9 @@ RSpec.describe Shape do
       )
     end
 
-    it "loads correctly from unpadded string" do 
+    it "loads correctly from unpadded string" do
       expect(unpadded.read(0,0)).to eq "a"
-      expect(unpadded.read(2,2)).to eq "a" 
+      expect(unpadded.read(2,2)).to eq "a"
       expect(unpadded.read(0,2)).to be_nil
       expect(unpadded.read(1,2)).to eq "a"
     end
@@ -27,163 +27,192 @@ RSpec.describe Shape do
       expect(padded).to eql unpadded
     end
   end
+
+  let(:a) do
+    Shape.from_string(
+      "aaaa\n" +
+      "a  a\n" +
+      "a  a\n" +
+      "aaaa\n"
+    )
+  end
+
+  let(:b) do
+    Shape.from_string(
+      "bbbc\n" +
+      "b  c\n" +
+      "a  c\n" +
+      "aaaa\n"
+    )
+  end
+
+  let(:c) do
+    Shape.from_string(
+      "bb\n" +
+      "bb\n"
+    )
+  end
+
+  let(:d) do
+    Shape.from_string(
+      "aaaa\n" +
+      "a  a\n" +
+      "a   \n" +
+      "aaaa\n"
+    )
+  end
+
+  let(:e) do
+    Shape.from_string(
+      "azxy\n" +
+      "b   \n" +
+      "c   \n" +
+      "d u \n"
+    )
+  end
+
+  let(:e_rotated) do
+    Shape.from_string(
+      "dcba\n" +
+      "   z\n" +
+      "u  x\n" +
+      "   y\n"
+    )
+  end
+
+  describe "#eql?" do
+    it "is true for same shapes" do
+      expect(a.eql? a).to eq true
+    end
+
+    it "is false for different shapes" do
+      expect(a.eql? b).to eq false
+    end
+  end
+
+  describe "#size" do
+    it { expect(a.size).to eq [4,4] }
+  end
+
+  describe "#cover?" do
+    it { expect(a).to cover b }
+    it { expect(b).to cover a }
+    it { expect(a).to_not cover c }
+    it { expect(c).to_not cover a }
+    it { expect(d).to_not cover a }
+    it { expect(a).to_not cover d }
+  end
+
+  describe "#rotate_clockwise" do
+    it { expect(e.rotate_clockwise).to eql e_rotated }
+  end
+
+  let(:no_symmetry) do
+    Shape.from_string(
+      " aa\n" +
+      "aa \n" +
+      " a \n"
+    )
+  end
+
+  let(:no_symmetry_flipped) do
+    Shape.from_string(
+      " a \n" +
+      "aa \n" +
+      " aa\n"
+    )
+  end
+
+  let(:rot_and_flip_symmetry) do
+    Shape.from_string(
+      "aaaaa\n"
+    )
+  end
+
+  let(:flip_symmetry) do
+    Shape.from_string(
+      "aaa\n" +
+      "a  \n" +
+      "a  \n"
+    )
+  end
+
+  describe "#flip" do
+    it { expect(no_symmetry.flip).to eql no_symmetry_flipped }
+  end
+
+  describe "#uniq_orientations" do
+    it { expect(no_symmetry.uniq_orientations.count).to eq 8 }
+    it { expect(rot_and_flip_symmetry.uniq_orientations.count).to eq 2 }
+    it { expect(flip_symmetry.uniq_orientations.count).to eq 4 }
+  end
+
+  describe "#each_pixel" do
+    it "is list of [row, col, val] for each pixel" do
+      e_each_pixel_expected = [
+        [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
+        [1, 0, "b"], [1, 1, nil], [1, 2, nil], [1, 3, nil],
+        [2, 0, "c"], [2, 1, nil], [2, 2, nil], [2, 3, nil],
+        [3, 0, "d"], [3, 1, nil], [3, 2, "u"], [3, 3, nil],
+      ]
+      expect(e.each_pixel).to eq e_each_pixel_expected
+    end
+  end
+
+  describe "#each_filled_pixel" do
+    it "is each pixel filtered to only non nil values" do
+      e_each_filled_pixel_expected = [
+        [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
+        [1, 0, "b"],
+        [2, 0, "c"],
+        [3, 0, "d"], [3, 2, "u"],
+      ]
+      expect(e.each_filled_pixel).to eq e_each_filled_pixel_expected
+    end
+  end
+
+  describe "#contains_at?" do
+    let(:target) do
+      Shape.from_string(
+        "aaa \n" +
+        "aaa \n" +
+        "aaaa\n" +
+        " aaa\n"
+      )
+    end
+
+    it "is true when it contains the shape" do
+      expect(target.contains_at?(no_symmetry, 0, 0)).to eq true
+      expect(target.contains_at?(no_symmetry_flipped, 0, 1)).to eq true
+      expect(target.contains_at?(no_symmetry, 1, 0)).to eq true
+      expect(target.contains_at?(no_symmetry_flipped, 1, 1)).to eq true
+    end
+
+    it "is false when it does not contain the shape" do
+      expect(target.contains_at?(no_symmetry, 0, 1)).to eq false
+      expect(target.contains_at?(no_symmetry, 1, 1)).to eq false
+    end
+  end
+
+  describe "#all_placements" do
+    let(:target) do
+      Shape.from_string(
+        "aaa \n" +
+        "aaa \n" +
+        "aaaa\n" +
+        " aaa\n"
+      )
+    end
+
+    it { expect(target.all_placements(no_symmetry)).to eq [[0, 0], [1, 0]] }
+    it { expect(target.all_placements(no_symmetry_flipped)).to eq [[0, 0], [0, 1], [1, 0], [1, 1]] }
+  end
+
+  describe "overlapped_by?" do
+    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 0, 0).to eq true }
+    it { expect(flip_symmetry.overlapped_by? flip_symmetry, -1, -1).to eq false }
+    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 1, 1).to eq false }
+    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 0, 1).to eq true }
+    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 1, 0).to eq true }
+  end
 end
-
-a = Shape.from_string(
-  "aaaa\n" + 
-  "a  a\n" +
-  "a  a\n" +
-  "aaaa\n"
-)
-
-b = Shape.from_string(
-  "bbbc\n" +
-  "b  c\n" + 
-  "a  c\n" +
-  "aaaa\n"
-)
-
-c = Shape.from_string(
-  "bb\n" +
-  "bb\n"
-)
-
-d = Shape.from_string(
-  "aaaa\n" +
-  "a  a\n" +
-  "a   \n" +
-  "aaaa\n"
-)
-
-e = Shape.from_string(
-  "azxy\n" +
-  "b   \n" + 
-  "c   \n" + 
-  "d u \n"
-)
-
-e_rotated = Shape.from_string(
-  "dcba\n" +
-  "   z\n" + 
-  "u  x\n" + 
-  "   y\n"
-)
-
-raise "eql? error" unless a.eql? a
-raise "eql? error" unless !a.eql? b
-raise "a.size != [4,4]" unless a.size == [4,4]
-raise "a expected to cover b" unless a.covers? b
-raise "b expected to cover a" unless b.covers? a
-raise "a expected to not cover c" unless !a.covers? c
-raise "c expected to not cover a" unless !c.covers? a
-raise "d expected to not cover a" unless !d.covers? a
-raise "a expected to not cover d" unless !a.covers? d
-puts "ok: shape#covers?"
-
-
-# rotate_clockwise
-raise "error:\n#{e.rotate_clockwise}\n!=\n#{e_rotated}" unless e.rotate_clockwise.covers? e_rotated
-puts "ok: shape#rotate_clockwise"
-
-
-# flip
-no_symmetry = Shape.from_string(
-  " aa\n" +
-  "aa \n" +
-  " a \n"
-)
-
-no_symmetry_flipped = Shape.from_string(
-  " a \n" +
-  "aa \n" +
-  " aa\n"
-)
-
-raise "not expected flipped:\n#{no_symmetry.flip}" unless no_symmetry.flip.eql? no_symmetry_flipped
-puts "ok: shape#flip"
-
-
-# uniq_orientations
-raise "should be 8 unique orientations" unless no_symmetry.uniq_orientations.count == 8
-
-rot_and_flip_symmetry = Shape.from_string(
-  "aaaaa\n"
-)
-
-raise "should be 2 unique orientations" unless rot_and_flip_symmetry.uniq_orientations.count == 2
-
-flip_symmetry = Shape.from_string(
-  "aaa\n" +
-  "a  \n" +
-  "a  \n"
-)
-
-raise "should be 4 unique orientations" unless flip_symmetry.uniq_orientations.count == 4
-
-puts "ok: shape#uniq_orientations"
-
-
-# each_pixel
-e_each_pixel = e.each_pixel.to_a
-e_each_pixel_expected = [
-  [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
-  [1, 0, "b"], [1, 1, nil], [1, 2, nil], [1, 3, nil],
-  [2, 0, "c"], [2, 1, nil], [2, 2, nil], [2, 3, nil],
-  [3, 0, "d"], [3, 1, nil], [3, 2, "u"], [3, 3, nil],
-]
-raise "each_pixel should have each pixel" unless e_each_pixel == e_each_pixel_expected
-
-puts "ok: shape#each_pixel"
-
-
-# each_filled_pixel
-e_each_filled_pixel = e.each_filled_pixel
-e_each_filled_pixel_expected = [
-  [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
-  [1, 0, "b"],
-  [2, 0, "c"],
-  [3, 0, "d"], [3, 2, "u"],
-]
-raise "e_each_filled_pixel should have each pixel" unless e_each_filled_pixel == e_each_filled_pixel_expected
-
-puts "ok: shape#each_filled_pixel"
-
-
-# contains_at?
-target = Shape.from_string(
-  "aaa \n" +
-  "aaa \n" +
-  "aaaa\n" + 
-  " aaa\n"
-)
-
-raise "contains_at? wrong" unless target.contains_at?(no_symmetry, 0, 0)
-raise "contains_at? wrong" unless !target.contains_at?(no_symmetry, 0, 1)
-raise "contains_at? wrong" unless target.contains_at?(no_symmetry_flipped, 0, 1)
-raise "contains_at? wrong" unless target.contains_at?(no_symmetry, 1, 0)
-raise "contains_at? wrong" unless target.contains_at?(no_symmetry_flipped, 1, 1)
-raise "contains_at? wrong" unless !target.contains_at?(no_symmetry, 1, 1)
-
-puts "ok: shape#contains_at?"
-
-
-# all_placements
-all_placements = target.all_placements(no_symmetry)
-expected = [[0, 0], [1, 0]]
-raise "all_placements" unless all_placements == expected
-
-all_placements = target.all_placements(no_symmetry_flipped)
-expected = [[0, 0], [0, 1], [1, 0], [1, 1]]
-raise "all_placements" unless all_placements == expected
-
-puts "ok: shape#all_placements"
-
-
-# overlapped_by?
-raise "overlapped_by?" unless flip_symmetry.overlapped_by? flip_symmetry, 0, 0
-raise "overlapped_by?" unless !flip_symmetry.overlapped_by? flip_symmetry, -1, -1
-raise "overlapped_by?" unless !flip_symmetry.overlapped_by? flip_symmetry, 1, 1
-raise "overlapped_by?" unless flip_symmetry.overlapped_by? flip_symmetry, 0, 1
-raise "overlapped_by?" unless flip_symmetry.overlapped_by? flip_symmetry, 1, 0
-
-puts "ok: shape#overlapped_by?"

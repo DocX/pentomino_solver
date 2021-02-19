@@ -14,7 +14,7 @@ class Shape
       .select { |line| line != "" }
       .map { |line| line[left_padding .. -1]}
       .select { |line| line != "" }
-    
+
     raise "must be one or more non empty lines" unless lines.count > 0
 
     cols = lines.map { |line| line.length }.max
@@ -52,7 +52,7 @@ class Shape
 
   def each_pixel
     return @each_pixel if @each_pixel
-    
+
     @each_pixel = rows.times.flat_map do |row|
       cols.times.map do |col|
         [row, col, @field[row][col]]
@@ -90,7 +90,7 @@ class Shape
     Shape.new(rows, cols, flipped)
   end
 
-  def covers?(other)
+  def cover?(other)
     return false unless other.size == size
 
     @field.each_with_index.all? do |row, row_i|
@@ -136,7 +136,7 @@ class Shape
     flipped_2 = flipped_1.rotate_clockwise
     flipped_3 = flipped_2.rotate_clockwise
 
-    @uniq_orientations = [ 
+    @uniq_orientations = [
       self,
       rotated_1,
       rotated_2,

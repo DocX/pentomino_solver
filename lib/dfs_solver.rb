@@ -6,14 +6,18 @@ class DFSSolver
 
     while !completed?(solution)
       iterations += 1
-      puts "Iterations: #{iterations}" if DEBUG && iterations % 100 == 0
+      if defined?(DEBUG) && iterations % 1000 == 0
+        puts
+        puts "Iteration: #{iterations}"
+        puts render_solution(solution).to_s
+      end
 
       placement = next_placement(solution, nil)
 
       if placement.nil?
         solution = backtrack(solution)
       else
-        solution << placement 
+        solution << placement
       end
     end
 
@@ -38,6 +42,10 @@ class DFSSolver
   end
 
   def next_placement(solution, previous)
+    raise NotImplementedError
+  end
+
+  def render_solution(solution)
     raise NotImplementedError
   end
 end
