@@ -105,8 +105,8 @@ RSpec.describe ShapesSolver do
     it "contains exactly all possible placements" do
       possible_placements_readable = StringIO.new
       solver.possible_placements.each do |placement|
-        possible_placements_readable.puts "#{placement[:shape_id]}, #{placement[:row]}, #{placement[:col]}:"
-        possible_placements_readable.puts placement[:shape]
+        possible_placements_readable.puts "#{placement.shape_id}, #{placement.row}, #{placement.col}:"
+        possible_placements_readable.puts placement.shape
         possible_placements_readable.puts
       end
 
