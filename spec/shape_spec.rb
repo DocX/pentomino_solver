@@ -162,10 +162,10 @@ RSpec.describe Shape do
   describe "#each_filled_pixel" do
     it "is each pixel filtered to only non nil values" do
       e_each_filled_pixel_expected = [
-        [0, 0], [0, 1], [0, 2], [0, 3],
-        [1, 0],
-        [2, 0],
-        [3, 0], [3, 2],
+        [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
+        [1, 0, "b"],
+        [2, 0, "c"],
+        [3, 0, "d"], [3, 2, "u"],
       ]
       expect(e.each_filled_pixel).to eq e_each_filled_pixel_expected
     end
