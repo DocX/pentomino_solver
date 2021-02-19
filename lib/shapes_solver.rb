@@ -48,6 +48,15 @@ class ShapesSolver < DFSSolver
       remaining_space.any? { |placement| placement[:shape_id] == shape_id }
     }
 
+    # Check if there are pixels that cannot be covered by any of the remaining placements
+    return [nil, nil] unless target.each_filled_pixel.all? do |row, col, _|
+      (solution + remaining_space).any? do |placement|
+        placement[:shape].each_filled_pixel.any? do |p_row, p_col|
+          p_row + placement[:row] == row && p_col + placement[:col] == col
+        end
+      end
+    end
+
     # Lock each solution step to given shape id to avoid searching thru same space twice
     # as two identical sub-solutions could be computed when swapped shapes order
     # It is impossible to have two identical sub-solutions when shape is locked to each step

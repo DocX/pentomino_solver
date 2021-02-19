@@ -7,7 +7,7 @@ class DFSSolver
 
     while !completed?(solution)
       iterations += 1
-      if defined?(DEBUG) && iterations % 1000 == 0
+      if defined?(DEBUG) && iterations % 10000 == 0
         puts
         puts "Iteration: #{iterations}"
         puts render_solution(solution).to_s
