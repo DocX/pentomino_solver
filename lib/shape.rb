@@ -96,18 +96,6 @@ class Shape
     Shape.new(rows, cols, flipped)
   end
 
-  def cover?(other)
-    return false unless other.size == size
-
-    @field.each_with_index.all? do |row, row_i|
-      row.each_with_index.all? do |point, col_i|
-        other_point = other.read(row_i, col_i)
-
-        point.nil? ? other_point.nil? : !other_point.nil?
-      end
-    end
-  end
-
   def eql?(other)
     return false unless other.size == size
 

@@ -94,15 +94,6 @@ RSpec.describe Shape do
     it { expect(a.size).to eq [4,4] }
   end
 
-  describe "#cover?" do
-    it { expect(a).to cover b }
-    it { expect(b).to cover a }
-    it { expect(a).to_not cover c }
-    it { expect(c).to_not cover a }
-    it { expect(d).to_not cover a }
-    it { expect(a).to_not cover d }
-  end
-
   describe "#rotate_clockwise" do
     it { expect(e.rotate_clockwise).to eql e_rotated }
   end
