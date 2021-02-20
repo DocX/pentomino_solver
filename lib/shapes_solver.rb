@@ -19,6 +19,7 @@ class ShapesSolver < DFSSolver
       @shape = shape
       @target_pixels = Set.new(shape.each_filled_pixel.map { |pix_row, pix_col| [row + pix_row, col + pix_col] })
       @target_pixels_list = @target_pixels.to_a.sort
+      @overlap_cache = {}
     end
 
     def contains_pixel?(pixel)
@@ -26,6 +27,9 @@ class ShapesSolver < DFSSolver
     end
 
     def overlaps?(other)
+      cached_value = @overlap_cache[other]
+      return cached_value if !cached_value.nil?
+
       this_i = 0
       other_i = 0
       while this_i < target_pixels_list.count && other_i < other.target_pixels_list.count
@@ -35,10 +39,12 @@ class ShapesSolver < DFSSolver
         elsif comparison > 0
           other_i += 1
         else # ==
+          @overlap_cache[other] = true
           return true
         end
       end
 
+      @overlap_cache[other] = false
       false
     end
 

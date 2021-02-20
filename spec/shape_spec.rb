@@ -207,12 +207,4 @@ RSpec.describe Shape do
     it { expect(target.all_placements(no_symmetry)).to eq [[0, 0], [1, 0]] }
     it { expect(target.all_placements(no_symmetry_flipped)).to eq [[0, 0], [0, 1], [1, 0], [1, 1]] }
   end
-
-  describe "overlapped_by?" do
-    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 0, 0).to eq true }
-    it { expect(flip_symmetry.overlapped_by? flip_symmetry, -1, -1).to eq false }
-    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 1, 1).to eq false }
-    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 0, 1).to eq true }
-    it { expect(flip_symmetry.overlapped_by? flip_symmetry, 1, 0).to eq true }
-  end
 end

@@ -178,18 +178,4 @@ class Shape
       !read(other_row + row, other_col + col).nil?
     end
   end
-
-  # Determines if this shape is partially covered by other shape at given position
-  # Position can be negative relative to current shape
-  def overlapped_by?(shape, row, col)
-    shape.each_filled_pixel.any? do |other_row, other_col|
-      this_row = other_row + row
-      this_col = other_col + col
-      if this_row < 0 || this_col < 0 || this_row >= rows || this_col >= cols
-        false
-      else
-        !read(this_row, this_col).nil?
-      end
-    end
-  end
 end
