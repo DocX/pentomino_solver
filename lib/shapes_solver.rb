@@ -1,5 +1,6 @@
 require './lib/dfs_solver.rb'
 require './lib/shape.rb'
+require 'set'
 
 class ShapesSolver < DFSSolver
   # initialize with list of all possible placements
@@ -16,7 +17,34 @@ class ShapesSolver < DFSSolver
       @row = row
       @col = col
       @shape = shape
+      @target_pixels = Set.new(shape.each_filled_pixel.map { |pix_row, pix_col| [row + pix_row, col + pix_col] })
+      @target_pixels_list = @target_pixels.to_a.sort
     end
+
+    def contains_pixel?(pixel)
+      @target_pixels.include? pixel
+    end
+
+    def overlaps?(other)
+      this_i = 0
+      other_i = 0
+      while this_i < target_pixels_list.count && other_i < other.target_pixels_list.count
+        comparison = target_pixels_list[this_i] <=> other.target_pixels_list[other_i]
+        if comparison < 0
+          this_i += 1
+        elsif comparison > 0
+          other_i += 1
+        else # ==
+          return true
+        end
+      end
+
+      false
+    end
+
+    protected
+
+    attr_reader :target_pixels, :target_pixels_list
   end
 
   attr_reader :target_picture, :shapes, :target
@@ -97,13 +125,7 @@ class ShapesSolver < DFSSolver
     }
 
     # Check if there are pixels that cannot be covered by any of the remaining placements
-    return [nil, nil] unless target.each_filled_pixel.all? do |row, col, _|
-      (solution + remaining_space).any? do |placement|
-        placement.shape.each_filled_pixel.any? do |p_row, p_col|
-          p_row + placement.row == row && p_col + placement.col == col
-        end
-      end
-    end
+    return [nil, nil] unless all_remaining_pixels_have_placement?(solution, remaining_space)
 
     # Lock each solution step to given shape id to avoid searching thru same space twice
     # as two identical sub-solutions could be computed when swapped shapes order
@@ -120,19 +142,22 @@ class ShapesSolver < DFSSolver
     [next_solution, next_space]
   end
 
+  def all_remaining_pixels_have_placement?(solution, remaining_space)
+    target.each_filled_pixel.each do |pixel|
+      pixel_result = solution.any? { |placement| placement.contains_pixel?(pixel) }
+      pixel_result ||= remaining_space.any? { |placement| placement.contains_pixel?(pixel) }
+
+      return false unless pixel_result
+    end
+    return true
+  end
+
   # Valid placement is one that does not cover already placed shapes
   # And is not a shape that is already placed
   def valid_placement?(solution, placement)
     # exclude already placed shapes
-    return false if solution.any? { |s| s.shape_id == placement.shape_id}
-
-    # any existing placements overlaps this placement?
-    return false if solution.any? do |s|
-      relative_row = placement.row - s.row
-      relative_col = placement.col - s.col
-
-      s.shape.overlapped_by?(placement.shape, relative_row, relative_col)
-    end
+    # or any existing placements overlaps this placement
+    solution.each { |s| return false if s.shape_id == placement.shape_id || s.overlaps?(placement) }
 
     true
   end
@@ -144,7 +169,7 @@ class ShapesSolver < DFSSolver
   def render_solution(solution)
     picture = Array.new(target.rows) { Array.new(target.cols) }
     solution.each do |placement|
-      placement.shape.each_filled_pixel.each do |row, col, val|
+      placement.shape.each_filled_pixel_with_val.each do |row, col, val|
         picture[row + placement.row][col + placement.col] = val
       end
     end

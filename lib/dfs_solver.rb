@@ -2,8 +2,14 @@ class DFSSolver
   attr_accessor :debug
 
   def solve
-    solution = []
-    remaining_space = [initial_remaining_space]
+    if @solution
+      last_placement = @solution.pop
+      @remaining_space.pop
+      @remaining_space[@remaining_space.count - 1] = @remaining_space.last.reject { |placement| placement.equal? last_placement }
+    end
+
+    solution = @solution || []
+    remaining_space = @remaining_space || [initial_remaining_space]
 
     iterations = 0
     last_iterations_time = Time.now
@@ -36,6 +42,9 @@ class DFSSolver
       puts render_solution(solution).to_s
       puts ""
     end
+
+    @solution = solution
+    @remaining_space = remaining_space
 
     return solution
   end

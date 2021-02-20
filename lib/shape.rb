@@ -61,7 +61,13 @@ class Shape
   end
 
   def each_filled_pixel
-    @each_filled_pixel ||= each_pixel.select { |row, col, val| !val.nil? }
+    @each_filled_pixel ||= each_pixel
+      .select { |row, col, val| !val.nil? }
+      .map { |row, col, _| [row, col] }
+  end
+
+  def each_filled_pixel_with_val
+    @each_filled_pixel_with_val ||= each_pixel.select { |row, col, val| !val.nil? }
   end
 
   def rotate_clockwise
@@ -168,7 +174,7 @@ class Shape
   # Determines if this shape fully contains given shape at given position
   # If given shape has pixes outside this shape, it does not contain it
   def contains_at?(shape, row, col)
-    shape.each_filled_pixel.all? do |other_row, other_col, _|
+    shape.each_filled_pixel.all? do |other_row, other_col|
       !read(other_row + row, other_col + col).nil?
     end
   end
@@ -176,7 +182,7 @@ class Shape
   # Determines if this shape is partially covered by other shape at given position
   # Position can be negative relative to current shape
   def overlapped_by?(shape, row, col)
-    shape.each_filled_pixel.any? do |other_row, other_col, _|
+    shape.each_filled_pixel.any? do |other_row, other_col|
       this_row = other_row + row
       this_col = other_col + col
       if this_row < 0 || this_col < 0 || this_row >= rows || this_col >= cols

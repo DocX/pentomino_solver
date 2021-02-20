@@ -54,7 +54,6 @@ def solve(debug, filename)
   puts ""
 
   solution = solver.solve
-
   puts "Solution:"
   puts solver.render_solution(solution).to_s
   puts ""
