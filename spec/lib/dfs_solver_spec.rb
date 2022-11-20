@@ -1,4 +1,4 @@
-require './lib/dfs_solver'
+require 'lib/dfs_solver'
 
 RSpec.describe DFSSolver do
   class TestDFS < DFSSolver
@@ -18,10 +18,6 @@ RSpec.describe DFSSolver do
 
     def completed?(solution)
       solution == [5,4,3,2,1]
-    end
-
-    def render_solution(solution)
-      solution.inspect
     end
   end
 

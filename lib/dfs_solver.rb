@@ -60,8 +60,4 @@ class DFSSolver
   def next_placement(solution, remaining_space)
     raise NotImplementedError
   end
-
-  def render_solution(solution)
-    raise NotImplementedError
-  end
 end

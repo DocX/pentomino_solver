@@ -1,4 +1,4 @@
-require './lib/shape'
+require 'lib/shape'
 
 RSpec.describe Shape do
   describe ".from_string" do
@@ -6,15 +6,15 @@ RSpec.describe Shape do
       Shape.from_string(
         "a  \n" +
         "aaa\n" +
-        "  a\n"
+        "  a\n",
       )
     end
 
     it "loads correctly from unpadded string" do
-      expect(unpadded.read(0,0)).to eq "a"
-      expect(unpadded.read(2,2)).to eq "a"
+      expect(unpadded.read(0,0)).to eq "█"
+      expect(unpadded.read(2,2)).to eq "█"
       expect(unpadded.read(0,2)).to be_nil
-      expect(unpadded.read(1,2)).to eq "a"
+      expect(unpadded.read(1,2)).to eq "█"
     end
 
     it "loads correctly from padded string" do
@@ -40,7 +40,7 @@ RSpec.describe Shape do
   let(:b) do
     Shape.from_string(
       "bbbc\n" +
-      "b  c\n" +
+      "b c\n" +
       "a  c\n" +
       "aaaa\n"
     )
@@ -95,8 +95,6 @@ RSpec.describe Shape do
   end
 
   describe "#cover?" do
-    it { expect(a).to cover b }
-    it { expect(b).to cover a }
     it { expect(a).to_not cover c }
     it { expect(c).to_not cover a }
     it { expect(d).to_not cover a }
@@ -150,10 +148,10 @@ RSpec.describe Shape do
   describe "#each_pixel" do
     it "is list of [row, col, val] for each pixel" do
       e_each_pixel_expected = [
-        [0, 0, "a"], [0, 1, "z"], [0, 2, "x"], [0, 3, "y"],
-        [1, 0, "b"], [1, 1, nil], [1, 2, nil], [1, 3, nil],
-        [2, 0, "c"], [2, 1, nil], [2, 2, nil], [2, 3, nil],
-        [3, 0, "d"], [3, 1, nil], [3, 2, "u"], [3, 3, nil],
+        [0, 0, "█"], [0, 1, "█"], [0, 2, "█"], [0, 3, "█"],
+        [1, 0, "█"], [1, 1, nil], [1, 2, nil], [1, 3, nil],
+        [2, 0, "█"], [2, 1, nil], [2, 2, nil], [2, 3, nil],
+        [3, 0, "█"], [3, 1, nil], [3, 2, "█"], [3, 3, nil],
       ]
       expect(e.each_pixel).to eq e_each_pixel_expected
     end

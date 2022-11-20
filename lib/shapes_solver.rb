@@ -1,5 +1,5 @@
-require './lib/dfs_solver.rb'
-require './lib/shape.rb'
+require 'lib/dfs_solver'
+require 'lib/shape'
 require 'set'
 
 class ShapesSolver < DFSSolver
@@ -170,16 +170,5 @@ class ShapesSolver < DFSSolver
 
   def completed?(solution)
     solution.count == shapes.count
-  end
-
-  def render_solution(solution)
-    picture = Array.new(target.rows) { Array.new(target.cols) }
-    solution.each do |placement|
-      placement.shape.each_filled_pixel_with_val.each do |row, col, val|
-        picture[row + placement.row][col + placement.col] = val
-      end
-    end
-
-    Shape.new(target.rows, target.cols, picture)
   end
 end

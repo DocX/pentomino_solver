@@ -1,6 +1,6 @@
 # Immutable shape
 class Shape
-  def self.from_string(string)
+  def self.from_string(string, key: nil)
     lines = string.each_line
       .select { |line| !line.strip.empty? }
       .to_a
@@ -22,16 +22,25 @@ class Shape
 
     pixels = lines.each_with_index.map do |line, row|
       Array.new(cols) do |col|
-        line[col] == " " ? nil : line[col]
+        case line[col]
+        when nil, " "
+          nil
+        else
+          key ||= line[col]
+          "█"
+        end
       end
     end
 
-    Shape.new(lines.size, lines[0].chomp.size, pixels)
+    Shape.new(lines.size, lines[0].chomp.size, pixels, key: key)
   end
 
-  def initialize(rows, cols, field)
+  attr_reader :key
+
+  def initialize(rows, cols, field, key:)
     raise "must be non zero area" unless rows > 0 && cols > 0
     @field = field
+    @key = key
   end
 
   def read(row, col)
@@ -80,7 +89,7 @@ class Shape
       end
     end
 
-    Shape.new(cols, rows, rotated)
+    Shape.new(cols, rows, rotated, key: @key)
   end
 
   def flip
@@ -93,7 +102,7 @@ class Shape
       end
     end
 
-    Shape.new(rows, cols, flipped)
+    Shape.new(rows, cols, flipped, key: @key)
   end
 
   def cover?(other)
@@ -115,7 +124,7 @@ class Shape
       row.each_with_index.all? do |point, col_i|
         other_point = other.read(row_i, col_i)
 
-        point == other_point
+        point.nil? == other_point.nil?
       end
     end
   end
@@ -125,8 +134,12 @@ class Shape
   end
 
   def to_s
+    render("█")
+  end
+
+  def render(character)
     @field.map do |row|
-      row.map { |point| point.nil? ? "." : point }.join("")
+      row.map { |point| point.nil? ? " " : character }.join("")
     end.join("\n")
   end
 

@@ -1,0 +1,66 @@
+shapes:
+- key: F
+  shape: |
+    .FF
+    FF
+     F
+- key: I
+  shape: |
+    I
+    I
+    I
+    I
+    I
+- key: L
+  shape: |
+    L
+    L
+    L
+    LL
+- key: "N"
+  shape: |
+    .N
+    NN
+    N
+    N
+- key: P
+  shape: |
+    .P
+    PP
+    PP
+- key: T
+  shape: |
+    TTT
+     T
+     T
+- key: U
+  shape: |
+    U U
+    UUU
+- key: V
+  shape: |
+    V
+    V
+    VVV
+- key: W
+  shape: |
+    W
+    WW
+     WW
+- key: X
+  shape: |
+    .X
+    XXX
+     X
+- key: "Y"
+  shape: |
+    .Y
+    YY
+     Y
+     Y
+- key: Z
+  shape: |
+    ZZ
+     Z
+     ZZ
+
