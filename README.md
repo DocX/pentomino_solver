@@ -48,3 +48,13 @@ The solution is placement of the usable shapes in space so they create the targe
 ## Solver
 
 Solver uses depth-first search algorithm with custom heuristics
+
+## How to use
+
+```
+bin/pantomino_solver.rb --shapes examples/shapes.yaml --target examples/targets/cat.yaml
+```
+
+## Example
+
+<img width="758" alt="Screenshot 2022-11-20 at 01 57 09" src="https://user-images.githubusercontent.com/132277/202877711-e235b1c3-503c-4aa9-996d-287b0655ecb9.png">
